@@ -1,3 +1,6 @@
+import sys, os
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+
 import torch
 import torch.nn as nn
 from torchvision import models
@@ -22,7 +25,8 @@ VOC_CLASSES = (
     'sheep', 'sofa', 'train', 'tvmonitor'
 )
 
-MODEL_PATH = '/content/drive/MyDrive/URP/models_ver2/model_0.h5'
+# MODEL_PATH = '/content/drive/MyDrive/URP/models_ver2/model_0.h5'
+MODEL_PATH = '../train/model.h5'
 BATCH_SIZE = 32
 
 # test dataset
@@ -42,7 +46,7 @@ model.load_state_dict(torch.load(MODEL_PATH))
 model = model.eval()
 
 # tensor image generate
-images = test_transformer(Image.open('cat.jpg')).view(1, 3, 224, 224)
+images = test_transformer(Image.open('test_img/cat2.jpg')).view(1, 3, 224, 224)
 images = images.to(device)
 
 # prediction
