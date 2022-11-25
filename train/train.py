@@ -1,3 +1,7 @@
+MODEL_NAME = "model_0"
+
+
+
 import sys, os
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
@@ -19,7 +23,7 @@ VOC_CLASSES = (
     'motorbike', 'person', 'pottedplant',
     'sheep', 'sofa', 'train', 'tvmonitor'
 )
-MODEL_PATH = 'model.h5'
+MODEL_PATH = '../result/model/'+MODEL_NAME+'.h5'
 BATCH_SIZE = 16
 EPOCH = 100
 

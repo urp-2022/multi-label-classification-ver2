@@ -1,13 +1,10 @@
-import sys, os
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-
 import torch
 import torch.nn as nn
 from torchvision import models
 import torchvision.transforms as transforms
 import numpy as np
 import time
-from model.model_resnet import resnet34
+from model_origin_resnet import resnet34
 
 from PIL import Image
 from datasets.loader import VOC
@@ -25,7 +22,7 @@ VOC_CLASSES = (
     'sheep', 'sofa', 'train', 'tvmonitor'
 )
 
-MODEL_PATH = '../result/model/model.h5'
+MODEL_PATH = '../result/model/model_origin.h5'
 BATCH_SIZE = 32
 
 # test dataset
@@ -52,12 +49,16 @@ images = images.to(device)
 
 model=model.to(device)
 
-for idx in range(20):
-  pred = model(images, idx)
-  pred_sigmoid = torch.sigmoid(pred)
-  pred_rounded = torch.round(pred_sigmoid)
-  if pred_rounded[0][0]==1:
-    print(VOC_CLASSES[idx]) 
+
+pred = model(images)
+pred_sigmoid = torch.sigmoid(pred)
+# print(pred_sigmoid)
+pred_rounded = torch.round(pred_sigmoid)
+tmp=pred_rounded.cpu().detach().numpy()[0]
+
+for i in range(20):
+  if tmp[i]==1:
+    print(VOC_CLASSES[i]) 
 
 #mAP============================
 from sklearn.metrics import average_precision_score, precision_recall_curve
@@ -69,24 +70,14 @@ targets = []
 with torch.no_grad():
     for input, target in test_loader:
         input = input.to(device)
-
-        p = []
-        for i in range(input.shape[0]):
-          p.append([])
-
-        for idx in range(20):
-          output = model(input,idx)
-          output = torch.sigmoid(output).cpu() #shape=torch.Size([32, 1])
-          for i in range(output.shape[0]):
-            p[i].append(output[i][0].cpu())
-
-        p = torch.tensor(p).to(device)
-        preds.append(p.cpu())
+        output = model(input)
+        output = torch.sigmoid(output).cpu() #shape=torch.Size([32, 1])
+        preds.append(output.cpu())
         targets.append(target.cpu())
 
-
+print(torch.cat(targets).numpy().shape)
 mAP_score = mAP(torch.cat(targets).numpy(), torch.cat(preds).numpy())
-
+print(mAP_score)
 for i in range(20):
   print(VOC_CLASSES[i]," mAP score:", mAP_score[i])
   

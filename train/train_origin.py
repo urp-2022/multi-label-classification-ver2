@@ -1,3 +1,11 @@
+MODEL_NAME = 'model_origin'
+MODEL_DESCRIPTION = ''
+
+f_desc=open('../result/model_description/'+MODEL_NAME+'.txt','w')
+f_train=open('../result/train_loss/'+MODEL_NAME+'.txt','w')
+f_valid=open('../result/valid_loss/'+MODEL_NAME+'.txt','w')
+
+
 import sys, os
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
@@ -6,9 +14,9 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
-from ..model.model_origin_resnet import resnet34
+from model.model_origin_resnet import resnet34
 import torchvision.transforms as transforms
-from ..datasets.loader import VOC
+from datasets.loader import VOC
 
 VOC_CLASSES = (
     'aeroplane', 'bicycle', 'bird', 'boat',
@@ -17,7 +25,7 @@ VOC_CLASSES = (
     'motorbike', 'person', 'pottedplant',
     'sheep', 'sofa', 'train', 'tvmonitor'
 )
-MODEL_PATH = 'model_origin.h5'
+MODEL_PATH = '../result/model/'+MODEL_NAME+'.h5'
 BATCH_SIZE = 16
 EPOCH = 100
 
@@ -38,7 +46,12 @@ valid_loader = voc.get_loader(transformer=valid_transformer, datatype='val')
 
     
 # load model
-model = resnet34(pretrained=True).to(device)
+# model = resnet34(pretrained=True).to(device)
+model = resnet34(pretrained=True)
+num_classes = 20
+num_ftrs = model.fc.in_features
+model.fc = nn.Linear(num_ftrs, num_classes)
+model.to(device)
 
 # Momentum / L2 panalty
 optimizer = optim.SGD(model.parameters(), lr=0.001, weight_decay=1e-5, momentum=0.9)
@@ -51,8 +64,6 @@ best_loss = 100
 train_iter = len(train_loader)
 valid_iter = len(valid_loader)
 
-
-aug_class_list = [4, 15, 17]
 
 for e in range(EPOCH):
     print("epoch : "+str(e))
@@ -85,10 +96,21 @@ for e in range(EPOCH):
             valid_loss += loss.item()
 
     total_valid_loss = valid_loss / valid_iter
-
+    
+    f_train.write("epoch "+str(e)+" : "+str(total_train_loss)+"\n")
+    f_valid.write("epoch "+str(e)+" : "+str(total_valid_loss)+"\n")
     print("[train loss / %f] [valid loss / %f]" % (total_train_loss, total_valid_loss))
 
     if best_loss > total_valid_loss:
         print("model saved\n")
-        torch.save(model.state_dict(), 'model_origin.h5')
+        torch.save(model.state_dict(), MODEL_PATH)
         best_loss = total_valid_loss
+
+MODEL_DESCRIPTION+='BATCH_SIZE:'+str(BATCH_SIZE)+'\nEPOCH: '+str(EPOCH)+"\n\n"
+MODEL_DESCRIPTION+='optimizer:\n'+str(optimizer.state_dict)+"\n\n"
+MODEL_DESCRIPTION+="scheduler:\n"+str(scheduler.state_dict())+"\n\n"
+
+f_desc.write(MODEL_DESCRIPTION)
+f_desc.close()
+f_train.close()
+f_valid.close()

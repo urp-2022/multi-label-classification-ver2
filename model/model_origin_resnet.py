@@ -119,7 +119,7 @@ class Bottleneck(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, block, layers, num_classes=20, zero_init_residual=False,
+    def __init__(self, block, layers, num_classes=1000, zero_init_residual=False,
                  groups=1, width_per_group=64, replace_stride_with_dilation=None,
                  norm_layer=None):
         super(ResNet, self).__init__()
@@ -219,14 +219,20 @@ class ResNet(nn.Module):
 def _resnet(arch, block, layers, pretrained, progress, **kwargs):
     model = ResNet(block, layers, **kwargs)
     if pretrained:
-        state_dict = model.state_dict()
-        pretrained_state_dict = load_state_dict_from_url(model_urls[arch], progress=progress)
-        # del(pretrained_state_dict['fc.weight'])
-        # del(pretrained_state_dict['fc.bias'])
-
-        state_dict.update(pretrained_state_dict)
+        state_dict = load_state_dict_from_url(model_urls[arch],
+                                              progress=progress)
         model.load_state_dict(state_dict)
     return model
+    # model = ResNet(block, layers, **kwargs)
+    # if pretrained:
+    #     state_dict = model.state_dict()
+    #     pretrained_state_dict = load_state_dict_from_url(model_urls[arch], progress=progress)
+    #     del(pretrained_state_dict['fc.weight'])
+    #     del(pretrained_state_dict['fc.bias'])
+
+    #     state_dict.update(pretrained_state_dict)
+    #     model.load_state_dict(state_dict)
+    # return model
 
 
 def resnet18(pretrained=False, progress=True, **kwargs):
