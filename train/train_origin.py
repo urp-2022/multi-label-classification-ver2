@@ -1,4 +1,4 @@
-MODEL_NAME = 'model_origin'
+MODEL_NAME = 'model_origin_ttt'
 MODEL_DESCRIPTION = ''
 
 f_desc=open('../result/model_description/'+MODEL_NAME+'.txt','w')

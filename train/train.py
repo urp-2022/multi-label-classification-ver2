@@ -1,5 +1,9 @@
 MODEL_NAME = "model_0"
+MODEL_DESCRIPTION = ''
 
+f_desc=open('../result/model_description/'+MODEL_NAME+'.txt','w')
+f_train=open('../result/train_loss/'+MODEL_NAME+'.txt','w')
+f_valid=open('../result/valid_loss/'+MODEL_NAME+'.txt','w')
 
 
 import sys, os
@@ -27,7 +31,6 @@ MODEL_PATH = '../result/model/'+MODEL_NAME+'.h5'
 BATCH_SIZE = 16
 EPOCH = 100
 
-
 ctx = "cuda" if torch.cuda.is_available() else "cpu"
 device = torch.device(ctx)
 
@@ -47,7 +50,7 @@ valid_loader = voc.get_loader(transformer=valid_transformer, datatype='val')
 model = resnet34(pretrained=True).to(device)
 model_dict = model.state_dict()
 
-print("our model")
+# print("our model")
 # print(model_dict.keys())
 
 #freezing
@@ -129,9 +132,21 @@ for e in range(EPOCH):
 
     total_valid_loss = (valid_loss /20) / valid_iter
 
+    f_train.write("epoch "+str(e)+" : "+str(total_train_loss)+"\n")
+    f_valid.write("epoch "+str(e)+" : "+str(total_valid_loss)+"\n")
     print("[train loss / %f] [valid loss / %f]" % (total_train_loss, total_valid_loss))
 
     if best_loss > total_valid_loss:
         best_loss = total_valid_loss
         print("model saved\n")
-        torch.save(model.state_dict(), 'model.h5')
+        torch.save(model.state_dict(), MODEL_PATH)
+
+
+MODEL_DESCRIPTION+='BATCH_SIZE:'+str(BATCH_SIZE)+'\nEPOCH: '+str(EPOCH)+"\n\n"
+MODEL_DESCRIPTION+='optimizer:\n'+str(total_optimizer.state_dict)+"\n\n"
+MODEL_DESCRIPTION+="scheduler:\n"+str(total_scheduler.state_dict())+"\n\n"
+
+f_desc.write(MODEL_DESCRIPTION)
+f_desc.close()
+f_train.close()
+f_valid.close()
