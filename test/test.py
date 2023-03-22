@@ -1,3 +1,8 @@
+MODEL_NAME = 'model_1'
+MAP_RESULT=''
+
+f_map=open('../result/MAP/'+MODEL_NAME+'.txt','w')
+
 import sys, os
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
@@ -25,8 +30,7 @@ VOC_CLASSES = (
     'sheep', 'sofa', 'train', 'tvmonitor'
 )
 
-MODEL_NAME = 'model_0.h5'
-MODEL_PATH = '../result/model/' + MODEL_NAME
+MODEL_PATH = '../result/model/' + MODEL_NAME +'.h5'
 BATCH_SIZE = 32
 
 # test dataset
@@ -90,5 +94,10 @@ mAP_score = mAP(torch.cat(targets).numpy(), torch.cat(preds).numpy())
 
 for i in range(20):
   print(VOC_CLASSES[i]," mAP score:", mAP_score[i])
+  MAP_RESULT+=str(VOC_CLASSES[i])+" "+str(mAP_score[i])+"\n"
   
 print("\nTotal mAP: ",100 * mAP_score.mean())
+MAP_RESULT+="\n\nTotal mAP: "+str(100 * mAP_score.mean())
+
+f_map.write(MAP_RESULT)
+f_map.close()
