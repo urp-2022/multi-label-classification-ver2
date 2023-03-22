@@ -25,7 +25,8 @@ VOC_CLASSES = (
     'sheep', 'sofa', 'train', 'tvmonitor'
 )
 
-MODEL_PATH = '../result/model/model.h5'
+MODEL_NAME = 'model_0.h5'
+MODEL_PATH = '../result/model/' + MODEL_NAME
 BATCH_SIZE = 32
 
 # test dataset
