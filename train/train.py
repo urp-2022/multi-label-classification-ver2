@@ -18,6 +18,7 @@ from tqdm import tqdm
 from model.model_resnet import resnet18,resnet34,resnet50
 import torchvision.transforms as transforms
 from datasets.loader import VOC
+import copy
 
 
 VOC_CLASSES = (
@@ -54,11 +55,11 @@ model_dict = model.state_dict()
 # print(model_dict.keys())
 
 #freezing
-for name, param in model.named_parameters():
-    if "fc" in name:
-        param.require_grad = True
-    else:
-        param.require_grad = False
+# for name, param in model.named_parameters():
+#     if "fc" in name:
+#         param.require_grad = True
+#     else:
+#         param.require_grad = False
 
 # for name, param in model.named_parameters():
 #     print(name, param.require_grad)
@@ -92,8 +93,9 @@ for e in range(EPOCH):
         images = images.to(device)
         targets = targets.to(device)
 
+        store_grad = []
         # forward
-        for idx in range(20):
+        for idx in range(3):
             class_targets = []
             for j in range(targets.shape[0]):
                 li = []
@@ -108,45 +110,56 @@ for e in range(EPOCH):
 
             total_optimizer.zero_grad()
             loss.backward()
-            total_optimizer.step()
+            for name, param in model.named_parameters():
+                if "fc"+str(idx)+"." in name:
+                    print(name)
+                    store_grad.append(copy.deepcopy(param.grad))
+            
+            print("===============================")
+        #store_grad update
+        print(store_grad)
+        print(len(store_grad))
+        total_optimizer.step()
+        break
+    break
 
-    total_train_loss = (train_loss/20) / train_iter
-    total_scheduler.step()
+    # total_train_loss = (train_loss/20) / train_iter
+    # total_scheduler.step()
 
-    with torch.no_grad():
-        for images, targets in valid_loader:
-            images = images.to(device)
-            targets = targets.to(device)
-            for idx in range(20):
-                class_targets = []
-                for j in range(targets.shape[0]):
-                    li = []
-                    li.append(targets[j][idx])
-                    class_targets.append(li)
-                class_targets = torch.tensor(class_targets).to(device)
+#     with torch.no_grad():
+#         for images, targets in valid_loader:
+#             images = images.to(device)
+#             targets = targets.to(device)
+#             for idx in range(20):
+#                 class_targets = []
+#                 for j in range(targets.shape[0]):
+#                     li = []
+#                     li.append(targets[j][idx])
+#                     class_targets.append(li)
+#                 class_targets = torch.tensor(class_targets).to(device)
 
-                pred = model(images, idx)
-                # loss
-                loss = criterion(pred.double(), class_targets)
-                valid_loss += loss.item()
+#                 pred = model(images, idx)
+#                 # loss
+#                 loss = criterion(pred.double(), class_targets)
+#                 valid_loss += loss.item()
 
-    total_valid_loss = (valid_loss /20) / valid_iter
+#     total_valid_loss = (valid_loss /20) / valid_iter
 
-    f_train.write("epoch "+str(e)+" : "+str(total_train_loss)+"\n")
-    f_valid.write("epoch "+str(e)+" : "+str(total_valid_loss)+"\n")
-    print("[train loss / %f] [valid loss / %f]" % (total_train_loss, total_valid_loss))
+#     f_train.write("epoch "+str(e)+" : "+str(total_train_loss)+"\n")
+#     f_valid.write("epoch "+str(e)+" : "+str(total_valid_loss)+"\n")
+#     print("[train loss / %f] [valid loss / %f]" % (total_train_loss, total_valid_loss))
 
-    if best_loss > total_valid_loss:
-        best_loss = total_valid_loss
-        print("model saved\n")
-        torch.save(model.state_dict(), MODEL_PATH)
+#     if best_loss > total_valid_loss:
+#         best_loss = total_valid_loss
+#         print("model saved\n")
+#         torch.save(model.state_dict(), MODEL_PATH)
 
 
-MODEL_DESCRIPTION+='BATCH_SIZE:'+str(BATCH_SIZE)+'\nEPOCH: '+str(EPOCH)+"\n\n"
-MODEL_DESCRIPTION+='optimizer:\n'+str(total_optimizer.state_dict)+"\n\n"
-MODEL_DESCRIPTION+="scheduler:\n"+str(total_scheduler.state_dict())+"\n\n"
+# MODEL_DESCRIPTION+='BATCH_SIZE:'+str(BATCH_SIZE)+'\nEPOCH: '+str(EPOCH)+"\n\n"
+# MODEL_DESCRIPTION+='optimizer:\n'+str(total_optimizer.state_dict)+"\n\n"
+# MODEL_DESCRIPTION+="scheduler:\n"+str(total_scheduler.state_dict())+"\n\n"
 
-f_desc.write(MODEL_DESCRIPTION)
-f_desc.close()
-f_train.close()
-f_valid.close()
+# f_desc.write(MODEL_DESCRIPTION)
+# f_desc.close()
+# f_train.close()
+# f_valid.close()
