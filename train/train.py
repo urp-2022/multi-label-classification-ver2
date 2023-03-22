@@ -84,7 +84,7 @@ valid_iter = len(valid_loader)
 model = model.to(device)
 model.train()
 
-for e in range(EPOCH):
+for e in range(1):
     print("epoch : "+str(e))
     train_loss = 0
     valid_loss = 0
@@ -93,9 +93,13 @@ for e in range(EPOCH):
         images = images.to(device)
         targets = targets.to(device)
 
-        store_grad = []
+        grad_fc = []
+        grad_before_fc = []
+        
+        
+        total_optimizer.zero_grad()
         # forward
-        for idx in range(3):
+        for idx in range(20):
             class_targets = []
             for j in range(targets.shape[0]):
                 li = []
@@ -104,27 +108,145 @@ for e in range(EPOCH):
             class_targets = torch.tensor(class_targets).to(device)
             
             pred = model(images, idx)
+            
             # loss
             loss = criterion(pred.double(), class_targets)
             train_loss += loss.item()
-
-            total_optimizer.zero_grad()
             loss.backward()
-            for name, param in model.named_parameters():
-                if "fc"+str(idx)+"." in name:
-                    print(name)
-                    store_grad.append(copy.deepcopy(param.grad))
             
-            print("===============================")
-        #store_grad update
-        print(store_grad)
-        print(len(store_grad))
+            #storing layer grad -> grad_fc list
+            for name, param in model.named_parameters():
+                # fc index layer
+                if "fc"+str(idx)+"." in name:
+                    grad_fc.append(copy.deepcopy(param.grad))
+            #     # before fc layer
+            #     elif "fc" not in name:
+            #         if idx == 0:
+            #             grad_before_fc.append(copy.deepcopy(param.grad))
+            #         # else:
+                    #     before_fc_num = 0
+                    #     grad_before_fc[before_fc_num] += copy.deepcopy(param.grad)
+
+        #updating grad_fc list -> fc layer grad 
+        # fc_num = 0
+        # for name, param in model.named_parameters():
+        #     if "fc" in name:
+        #         param.grad = copy.deepcopy(grad_fc[fc_num])
+        #         fc_num+=1
+
+        print(grad_fc[0])        
+        print(grad_fc[1])  
+        print(grad_fc[114])        
+        print(grad_fc[115])
+        print("==============================================")  
+        for name, param in model.named_parameters():
+            if "fc0.0" in name or "fc19.0" in name:
+                print(name)
+                print(param.grad)
+
         total_optimizer.step()
         break
     break
 
-    # total_train_loss = (train_loss/20) / train_iter
-    # total_scheduler.step()
+    total_train_loss = (train_loss/20) / train_iter
+    total_scheduler.step()
+
+    with torch.no_grad():
+        for images, targets in valid_loader:
+            images = images.to(device)
+            targets = targets.to(device)
+            for idx in range(20):
+                class_targets = []
+                for j in range(targets.shape[0]):
+                    li = []
+                    li.append(targets[j][idx])
+                    class_targets.append(li)
+                class_targets = torch.tensor(class_targets).to(device)
+
+                pred = model(images, idx)
+                # loss
+                loss = criterion(pred.double(), class_targets)
+                valid_loss += loss.item()
+
+    total_valid_loss = (valid_loss /20) / valid_iter
+
+    f_train.write("epoch "+str(e)+" : "+str(total_train_loss)+"\n")
+    f_valid.write("epoch "+str(e)+" : "+str(total_valid_loss)+"\n")
+    print("[train loss / %f] [valid loss / %f]" % (total_train_loss, total_valid_loss))
+
+    if best_loss > total_valid_loss:
+        best_loss = total_valid_loss
+        print("model saved\n")
+        torch.save(model.state_dict(), MODEL_PATH)
+        
+        
+# print("----------------------------------------------------------------------")
+# print("----------------------------------------------------------------------")
+# #======================================================================
+# for e in range(1):
+#     print("epoch : "+str(e))
+#     train_loss = 0
+#     valid_loss = 0
+    
+#     for i, (images, targets) in tqdm(enumerate(train_loader), total=train_iter):
+#         images = images.to(device)
+#         targets = targets.to(device)
+
+#         grad_fc = []
+#         grad_before_fc = []
+        
+    
+#         # forward
+#         for idx in range(20):
+#             class_targets = []
+#             for j in range(targets.shape[0]):
+#                 li = []
+#                 li.append(targets[j][idx])
+#                 class_targets.append(li)
+#             class_targets = torch.tensor(class_targets).to(device)
+            
+#             pred = model(images, idx)
+            
+#             # loss
+#             loss = criterion(pred.double(), class_targets)
+#             train_loss += loss.item()
+#             total_optimizer.zero_grad()
+#             loss.backward()
+            
+#             #storing layer grad -> grad_fc list
+#             before_fc_num = 0
+#             for name, param in model.named_parameters():
+#                 # fc index layer
+#                 if "fc"+str(idx)+"." in name:
+#                     grad_fc.append(copy.deepcopy(param.grad))
+#                 # before fc layer
+#                 elif "fc" not in name:
+#                     if idx == 0:
+#                         grad_before_fc.append(copy.deepcopy(param.grad))
+#                     else:
+#                         grad_before_fc[before_fc_num] += copy.deepcopy(param.grad)
+#                         before_fc_num+=1
+
+#         #updating grad_fc list -> fc layer grad 
+#         fc_num = 0
+#         for name, param in model.named_parameters():
+#             if "fc" in name:
+#                 param.grad = copy.deepcopy(grad_fc[fc_num])
+#                 fc_num+=1
+
+#         for name, param in model.named_parameters():
+#             if "fc0." in name or "fc19." in name:
+#                 print(name)
+#                 print(param.grad)
+#         print("///////////////////////////")
+#         print(grad_before_fc[0])
+                
+#         total_optimizer.step()
+#         break
+#     break
+
+#     total_train_loss = (train_loss/20) / train_iter
+#     total_scheduler.step()
 
 #     with torch.no_grad():
 #         for images, targets in valid_loader:
@@ -153,6 +275,7 @@ for e in range(EPOCH):
 #         best_loss = total_valid_loss
 #         print("model saved\n")
 #         torch.save(model.state_dict(), MODEL_PATH)
+# #=============================================================================
 
 
 # MODEL_DESCRIPTION+='BATCH_SIZE:'+str(BATCH_SIZE)+'\nEPOCH: '+str(EPOCH)+"\n\n"
