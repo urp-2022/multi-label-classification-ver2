@@ -1,10 +1,18 @@
+MODEL_NAME = 'model_origin'
+MAP_RESULT=''
+
+f_map=open('../result/mAP/'+MODEL_NAME+'.txt','w')
+
+import sys, os
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+
 import torch
 import torch.nn as nn
 from torchvision import models
 import torchvision.transforms as transforms
 import numpy as np
 import time
-from model_origin_resnet import resnet34
+from model.model_origin_resnet import resnet34
 
 from PIL import Image
 from datasets.loader import VOC
@@ -22,7 +30,7 @@ VOC_CLASSES = (
     'sheep', 'sofa', 'train', 'tvmonitor'
 )
 
-MODEL_PATH = '../result/model/model_origin.h5'
+MODEL_PATH = '../result/model/' + MODEL_NAME +'.h5'
 BATCH_SIZE = 32
 
 # test dataset
@@ -34,6 +42,9 @@ test_loader = voc.get_loader(transformer=test_transformer, datatype='test')
 
 # load model
 model = resnet34().to(device)
+num_classes = 20
+num_ftrs = model.fc.in_features
+model.fc = nn.Linear(num_ftrs, num_classes)
 
 # load weight
 model.load_state_dict(torch.load(MODEL_PATH))
@@ -80,5 +91,10 @@ mAP_score = mAP(torch.cat(targets).numpy(), torch.cat(preds).numpy())
 print(mAP_score)
 for i in range(20):
   print(VOC_CLASSES[i]," mAP score:", mAP_score[i])
+  MAP_RESULT+=str(VOC_CLASSES[i])+" "+str(mAP_score[i])+"\n"
   
 print("\nTotal mAP: ",100 * mAP_score.mean())
+MAP_RESULT+="\n\nTotal mAP: "+str(100 * mAP_score.mean())
+
+f_map.write(MAP_RESULT)
+f_map.close()
