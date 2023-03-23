@@ -156,66 +156,27 @@ class ResNet(nn.Module):
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2,
                                        dilate=replace_stride_with_dilation[2])
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc0 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
-                               nn.Linear(256 * block.expansion, 128 * block.expansion),
-                               nn.Linear(128 * block.expansion, num_classes))
-        self.fc1 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
-                               nn.Linear(256 * block.expansion, 128 * block.expansion),
-                               nn.Linear(128 * block.expansion, num_classes))
-        self.fc2 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
-                               nn.Linear(256 * block.expansion, 128 * block.expansion),
-                               nn.Linear(128 * block.expansion, num_classes))
-        self.fc3 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
-                               nn.Linear(256 * block.expansion, 128 * block.expansion),
-                               nn.Linear(128 * block.expansion, num_classes))
-        self.fc4 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
-                               nn.Linear(256 * block.expansion, 128 * block.expansion),
-                               nn.Linear(128 * block.expansion, num_classes))
-        self.fc5 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
-                               nn.Linear(256 * block.expansion, 128 * block.expansion),
-                               nn.Linear(128 * block.expansion, num_classes))
-        self.fc6 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
-                               nn.Linear(256 * block.expansion, 128 * block.expansion),
-                               nn.Linear(128 * block.expansion, num_classes))
-        self.fc7 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
-                               nn.Linear(256 * block.expansion, 128 * block.expansion),
-                               nn.Linear(128 * block.expansion, num_classes))
-        self.fc8 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
-                               nn.Linear(256 * block.expansion, 128 * block.expansion),
-                               nn.Linear(128 * block.expansion, num_classes))
-        self.fc9 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
-                               nn.Linear(256 * block.expansion, 128 * block.expansion),
-                               nn.Linear(128 * block.expansion, num_classes))
-        self.fc10 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
-                               nn.Linear(256 * block.expansion, 128 * block.expansion),
-                               nn.Linear(128 * block.expansion, num_classes))
-        self.fc11 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
-                               nn.Linear(256 * block.expansion, 128 * block.expansion),
-                               nn.Linear(128 * block.expansion, num_classes))
-        self.fc12 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
-                               nn.Linear(256 * block.expansion, 128 * block.expansion),
-                               nn.Linear(128 * block.expansion, num_classes))
-        self.fc13 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
-                               nn.Linear(256 * block.expansion, 128 * block.expansion),
-                               nn.Linear(128 * block.expansion, num_classes))
-        self.fc14 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
-                               nn.Linear(256 * block.expansion, 128 * block.expansion),
-                               nn.Linear(128 * block.expansion, num_classes))
-        self.fc15 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
-                               nn.Linear(256 * block.expansion, 128 * block.expansion),
-                               nn.Linear(128 * block.expansion, num_classes))
-        self.fc16 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
-                               nn.Linear(256 * block.expansion, 128 * block.expansion),
-                               nn.Linear(128 * block.expansion, num_classes))
-        self.fc17 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
-                               nn.Linear(256 * block.expansion, 128 * block.expansion),
-                               nn.Linear(128 * block.expansion, num_classes))
-        self.fc18 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
-                               nn.Linear(256 * block.expansion, 128 * block.expansion),
-                               nn.Linear(128 * block.expansion, num_classes))
-        self.fc19 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
-                               nn.Linear(256 * block.expansion, 128 * block.expansion),
-                               nn.Linear(128 * block.expansion, num_classes))
+        self.fc0 = nn.Linear(512 * block.expansion, num_classes)
+        self.fc1 = nn.Linear(512 * block.expansion, num_classes)
+        self.fc2 = nn.Linear(512 * block.expansion, num_classes)
+        self.fc3 = nn.Linear(512 * block.expansion, num_classes)
+        self.fc4 = nn.Linear(512 * block.expansion, num_classes)
+        self.fc5 = nn.Linear(512 * block.expansion, num_classes)
+        self.fc6 = nn.Linear(512 * block.expansion, num_classes)
+        self.fc7 = nn.Linear(512 * block.expansion, num_classes)
+        self.fc8 = nn.Linear(512 * block.expansion, num_classes)
+        self.fc9 = nn.Linear(512 * block.expansion, num_classes)
+        self.fc10 = nn.Linear(512 * block.expansion, num_classes)
+        self.fc11 = nn.Linear(512 * block.expansion, num_classes)
+        self.fc12 = nn.Linear(512 * block.expansion, num_classes)
+        self.fc13 = nn.Linear(512 * block.expansion, num_classes)
+        self.fc14 = nn.Linear(512 * block.expansion, num_classes)
+        self.fc15 = nn.Linear(512 * block.expansion, num_classes)
+        self.fc16 = nn.Linear(512 * block.expansion, num_classes)
+        self.fc17 = nn.Linear(512 * block.expansion, num_classes)
+        self.fc18 = nn.Linear(512 * block.expansion, num_classes)
+        self.fc19 = nn.Linear(512 * block.expansion, num_classes)
+        
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
