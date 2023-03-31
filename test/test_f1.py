@@ -1,7 +1,7 @@
 MODEL_NAME = 'model_4'
 MAP_RESULT=''
 
-# f_map=open('../result/mAP/'+MODEL_NAME+'.txt','w')
+# f_map=open('../result/F1/'+MODEL_NAME+'.txt','w')
 
 import sys, os
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
