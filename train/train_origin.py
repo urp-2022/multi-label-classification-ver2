@@ -1,4 +1,4 @@
-MODEL_NAME = 'model_origin_ttt'
+MODEL_NAME = 'resnet101/model_origin_4'
 MODEL_DESCRIPTION = ''
 
 f_desc=open('../result/model_description/'+MODEL_NAME+'.txt','w')
@@ -14,7 +14,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
-from model.model_origin_resnet import resnet34
+from model.model_origin_resnet import resnet101,resnet50, resnet34, resnet18
 import torchvision.transforms as transforms
 from datasets.loader import VOC
 
@@ -46,15 +46,18 @@ valid_loader = voc.get_loader(transformer=valid_transformer, datatype='val')
 
     
 # load model
-# model = resnet34(pretrained=True).to(device)
-model = resnet34(pretrained=True)
+model = resnet101(pretrained=True).to(device)
 num_classes = 20
 num_ftrs = model.fc.in_features
 model.fc = nn.Linear(num_ftrs, num_classes)
 model.to(device)
 
+# for name, child in model.named_children():
+#     for param in child.parameters():
+#         print(name)
+
 # Momentum / L2 panalty
-optimizer = optim.SGD(model.parameters(), lr=0.001, weight_decay=1e-5, momentum=0.9)
+optimizer = optim.SGD(model.parameters(), lr=0.005, weight_decay=1e-5, momentum=0.9)
 scheduler = optim.lr_scheduler.MultiStepLR(optimizer=optimizer,
                                            milestones=[30, 80],
                                            gamma=0.1)
@@ -76,6 +79,8 @@ for e in range(EPOCH):
 
         model = model.to(device)
         pred = model(images)
+        # print(pred)
+        # print(targets)
         loss = criterion(pred.double(), targets)
         train_loss += loss.item()
 

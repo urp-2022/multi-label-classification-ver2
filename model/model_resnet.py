@@ -156,6 +156,7 @@ class ResNet(nn.Module):
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2,
                                        dilate=replace_stride_with_dilation[2])
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        
         self.fc0 = nn.Linear(512 * block.expansion, num_classes)
         self.fc1 = nn.Linear(512 * block.expansion, num_classes)
         self.fc2 = nn.Linear(512 * block.expansion, num_classes)
@@ -176,6 +177,69 @@ class ResNet(nn.Module):
         self.fc17 = nn.Linear(512 * block.expansion, num_classes)
         self.fc18 = nn.Linear(512 * block.expansion, num_classes)
         self.fc19 = nn.Linear(512 * block.expansion, num_classes)
+        
+        self.fc_last = nn.Linear(200704, 20)
+        
+        # self.fc0 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
+        #                         nn.ReLU(inplace=True),
+        #                         nn.Linear(256 * block.expansion, num_classes))
+        # self.fc1 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
+        #                         nn.ReLU(inplace=True),
+        #                         nn.Linear(256 * block.expansion, num_classes))
+        # self.fc2 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
+        #                         nn.ReLU(inplace=True),
+        #                         nn.Linear(256 * block.expansion, num_classes))
+        # self.fc3 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
+        #                         nn.ReLU(inplace=True),
+        #                         nn.Linear(256 * block.expansion, num_classes))
+        # self.fc4 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
+        #                         nn.ReLU(inplace=True),
+        #                         nn.Linear(256 * block.expansion, num_classes))
+        # self.fc5 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
+        #                         nn.ReLU(inplace=True),
+        #                         nn.Linear(256 * block.expansion, num_classes))
+        # self.fc6 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
+        #                         nn.ReLU(inplace=True),
+        #                         nn.Linear(256 * block.expansion, num_classes))
+        # self.fc7 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
+        #                         nn.ReLU(inplace=True),
+        #                         nn.Linear(256 * block.expansion, num_classes))
+        # self.fc8 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
+        #                         nn.ReLU(inplace=True),
+        #                         nn.Linear(256 * block.expansion, num_classes))
+        # self.fc9 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
+        #                         nn.ReLU(inplace=True),
+        #                         nn.Linear(256 * block.expansion, num_classes))
+        # self.fc10 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
+        #                         nn.ReLU(inplace=True),
+        #                         nn.Linear(256 * block.expansion, num_classes))
+        # self.fc11 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
+        #                         nn.ReLU(inplace=True),
+        #                         nn.Linear(256 * block.expansion, num_classes))
+        # self.fc12 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
+        #                         nn.ReLU(inplace=True),
+        #                         nn.Linear(256 * block.expansion, num_classes))
+        # self.fc13 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
+        #                         nn.ReLU(inplace=True),
+        #                         nn.Linear(256 * block.expansion, num_classes))
+        # self.fc14 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
+        #                         nn.ReLU(inplace=True),
+        #                         nn.Linear(256 * block.expansion, num_classes))
+        # self.fc15 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
+        #                         nn.ReLU(inplace=True),
+        #                         nn.Linear(256 * block.expansion, num_classes))
+        # self.fc16 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
+        #                         nn.ReLU(inplace=True),
+        #                         nn.Linear(256 * block.expansion, num_classes))
+        # self.fc17 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
+        #                         nn.ReLU(inplace=True),
+        #                         nn.Linear(256 * block.expansion, num_classes))
+        # self.fc18 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
+        #                         nn.ReLU(inplace=True),
+        #                         nn.Linear(256 * block.expansion, num_classes))
+        # self.fc19 = nn.Sequential(nn.Linear(512 * block.expansion, 256 * block.expansion),
+        #                         nn.ReLU(inplace=True),
+        #                         nn.Linear(256 * block.expansion, num_classes))
         
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -218,12 +282,15 @@ class ResNet(nn.Module):
 
         return nn.Sequential(*layers)
 
-    def _forward_impl(self, x, idx):
+    def _forward_impl(self, x):
         # See note [TorchScript super()]
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
         x = self.maxpool(x)
+
+        copy=torch.flatten(x, 1)
+        copy=self.fc_last(copy)
 
         x = self.layer1(x)
         x = self.layer2(x)
@@ -232,52 +299,77 @@ class ResNet(nn.Module):
 
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
+
+        x0=x
+        x1=x
+        x2=x
+        x3=x
+        x4=x
+        x5=x
+        x6=x
+        x7=x
+        x8=x
+        x9=x
+        x10=x
+        x11=x
+        x12=x
+        x13=x
+        x14=x
+        x15=x
+        x16=x
+        x17=x
+        x18=x
+        x19=x
         
-        if idx==0:
-            x = self.fc0(x)
-        elif idx==1:
-            x = self.fc1(x)
-        elif idx==2:
-            x = self.fc2(x)
-        elif idx==3:
-            x = self.fc3(x)
-        elif idx==4:
-            x = self.fc4(x)
-        elif idx==5:
-            x = self.fc5(x)
-        elif idx==6:
-            x = self.fc6(x)
-        elif idx==7:
-            x = self.fc7(x)
-        elif idx==8:
-            x = self.fc8(x)
-        elif idx==9:
-            x = self.fc9(x)
-        elif idx==10:
-            x = self.fc10(x)
-        elif idx==11:
-            x = self.fc11(x)
-        elif idx==12:
-            x = self.fc12(x)
-        elif idx==13:
-            x = self.fc13(x)
-        elif idx==14:
-            x = self.fc14(x)
-        elif idx==15:
-            x = self.fc15(x)
-        elif idx==16:
-            x = self.fc16(x)
-        elif idx==17:
-            x = self.fc17(x)
-        elif idx==18:
-            x = self.fc18(x)
-        else:
-            x = self.fc19(x)
+        # x0 = self.fc0(x)
+        # x1 = self.fc1(x)
+        # x2 = self.fc2(x)
+        # x3 = self.fc3(x)
+        # x4 = self.fc4(x)
+        # x5 = self.fc5(x)
+        # x6 = self.fc6(x)
+        # x7 = self.fc7(x)
+        # x8 = self.fc8(x)
+        # x9 = self.fc9(x)
+        # x10 = self.fc10(x)
+        # x11 = self.fc11(x)
+        # x12 = self.fc12(x)
+        # x13 = self.fc13(x)
+        # x14 = self.fc14(x)
+        # x15 = self.fc15(x)
+        # x16 = self.fc16(x)
+        # x17 = self.fc17(x)
+        # x18 = self.fc18(x)    
+        # x19 = self.fc19(x)   
+        
+        x0 = self.fc0(x0)
+        x1 = self.fc1(x1)
+        x2 = self.fc2(x2)
+        x3 = self.fc3(x3)
+        x4 = self.fc4(x4)
+        x5 = self.fc5(x5)
+        x6 = self.fc6(x6)
+        x7 = self.fc7(x7)
+        x8 = self.fc8(x8)
+        x9 = self.fc9(x9)
+        x10 = self.fc10(x10)
+        x11 = self.fc11(x11)
+        x12 = self.fc12(x12)
+        x13 = self.fc13(x13)
+        x14 = self.fc14(x14)
+        x15 = self.fc15(x15)
+        x16 = self.fc16(x16)
+        x17 = self.fc17(x17)
+        x18 = self.fc18(x18)    
+        x19 = self.fc19(x19)   
 
+        x=torch.cat([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17,x18,x19],dim=1)
+        x=x+copy
+        # x=self.fc_last(x)
         return x
-
-    def forward(self, x, idx):
-        return self._forward_impl(x, idx)
+    
+    def forward(self, x):
+        return self._forward_impl(x)
 
 
 def _resnet(arch, block, layers, pretrained, progress, **kwargs):

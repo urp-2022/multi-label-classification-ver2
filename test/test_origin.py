@@ -1,4 +1,4 @@
-MODEL_NAME = 'model_origin'
+MODEL_NAME = 'resnet101/model_origin_4'
 MAP_RESULT=''
 
 f_map=open('../result/mAP/'+MODEL_NAME+'.txt','w')
@@ -12,7 +12,7 @@ from torchvision import models
 import torchvision.transforms as transforms
 import numpy as np
 import time
-from model.model_origin_resnet import resnet34
+from model.model_origin_resnet import resnet101,resnet50,resnet34, resnet18
 
 from PIL import Image
 from datasets.loader import VOC
@@ -41,7 +41,7 @@ voc = VOC(batch_size=BATCH_SIZE, year="2007")
 test_loader = voc.get_loader(transformer=test_transformer, datatype='test')
 
 # load model
-model = resnet34().to(device)
+model = resnet101().to(device)
 num_classes = 20
 num_ftrs = model.fc.in_features
 model.fc = nn.Linear(num_ftrs, num_classes)
@@ -72,7 +72,7 @@ for i in range(20):
     print(VOC_CLASSES[i]) 
 
 #mAP============================
-from sklearn.metrics import average_precision_score, precision_recall_curve
+# from sklearn.metrics import average_precision_score, precision_recall_curve
 np.seterr(invalid='ignore')
 
 preds = []

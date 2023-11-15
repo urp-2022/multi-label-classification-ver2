@@ -2,7 +2,8 @@ import os
 import sys
 import numpy as np
 import torch.utils.data as data
-from scipy.misc import imread
+# from scipy.misc import imread
+from imageio import imread
 from PIL import Image
 
 if sys.version_info[0] == 2:

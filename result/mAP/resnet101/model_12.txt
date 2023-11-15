@@ -1,0 +1,22 @@
+aeroplane  mAP score: 0.9798819091769043
+bicycle  mAP score: 0.913934435341436
+bird  mAP score: 0.9411057669999837
+boat  mAP score: 0.9402388072238681
+bottle  mAP score: 0.622798467265233
+bus  mAP score: 0.8688271272000012
+car  mAP score: 0.9358336464006767
+cat  mAP score: 0.9323028552879222
+chair  mAP score: 0.7383914753232129
+cow  mAP score: 0.779023777993689
+diningtable  mAP score: 0.8216951556763444
+dog  mAP score: 0.9331302952823898
+horse  mAP score: 0.9479637692414
+motorbike  mAP score: 0.9022791083932495
+person  mAP score: 0.9630018838738815
+pottedplant  mAP score: 0.6748576963287196
+sheep  mAP score: 0.7176451676632969
+sofa  mAP score: 0.7233314961435174
+train  mAP score: 0.9703879512441725
+tvmonitor  mAP score: 0.8420758388870543
+
+Total mAP:  85.74353315473478
